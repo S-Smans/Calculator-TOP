@@ -2,6 +2,7 @@
 
 Calculator created following along The Odin Project curriculum. Built with HTML5, CSS3 and JS ES6 features.
 It can be interacted with using a mouse.
+URL to project: https://s-smans.github.io/Calculator-TOP/
 
 ## Features
 
