@@ -45,6 +45,7 @@ const deleteAllRegex = /^[A]/;
 const undoRegex = /^[C]/;
 const operatorRegex = /[+\-/*]/;
 const equalsRegex = /[=]/;
+const dotRegex = /[.]/;
 
 let firstOperand = 0;
 let secondOperand = 0;
@@ -68,6 +69,21 @@ const handleValue = (event) => {
         displayOperator(value);
     } else if (equalsRegex.test(value)) {
         calculate();
+    } else if (dotRegex.test(value)) {
+        addDot();
+    }
+}
+
+const addDot = () => {
+    if (operatorRegex.test(displayValue.innerText)) {
+        secondOperand = displayValue.innerText.substring(displayValue.innerText.indexOf(currentOperator) + 1);
+        if (!dotRegex.test(secondOperand)) {
+            displayValue.innerText += ".";
+        }
+    }
+
+    if (!dotRegex.test(displayValue.innerText) && displayValue.innerText !== "") {
+        displayValue.innerText += ".";
     }
 }
 
@@ -79,6 +95,10 @@ const displayNumber = (number) => {
 
 const deleteAll = () => {
     displayValue.innerText = "";
+    historyValue.innerText = "";
+    firstOperand = 0;
+    secondOperand = 0;
+    currentOperator = "+";
 }
 
 const undoInput = () => {
@@ -86,11 +106,19 @@ const undoInput = () => {
 }
 
 const displayOperator = (operator) => {
+    // If display is empty then only add - operator
+    if (displayValue.innerText === "" && operator === "-") {
+        displayValue.innerText = "-";
+        return;
+    } else if (displayValue.innerText === "") {
+        return;
+    }
+
     if (!operatorRegex.test(displayValue.innerText)) {
         firstOperand = displayValue.innerText;
         currentOperator = operator;
         displayValue.innerText += operator;
-    } else {
+    } else if (secondOperand) {
         calculate();
         firstOperand = displayValue.innerText;
         currentOperator = operator;
@@ -99,10 +127,19 @@ const displayOperator = (operator) => {
 }
 
 const calculate = () => {
+    // If "=" is pressed right after pressing it then do nothing
+    if (!currentOperator) {
+        return;
+    }
+
     secondOperand = displayValue.innerText.substring(displayValue.innerText.indexOf(currentOperator) + 1);
     const result = operate(currentOperator, firstOperand, secondOperand);
     historyValue.innerText = displayValue.innerText;
     displayValue.innerText = result;
+
+    firstOperand = result;
+    currentOperator = undefined;
+    secondOperand = 0;
 }
 
 // Ads a event for each button click
